@@ -1,0 +1,19 @@
+id: tool_refund_calc
+station: tool_use
+difficulty: easy
+input: Order A-1002 arrived with a cracked screen. Our policy is a 25% refund for cosmetic damage. How much do we refund?
+tools: [lookup_order, calculate_refund]
+checks:
+  - type: tool_called
+    name: lookup_order
+    args: {order_id: "A-1002"}
+  - type: tool_called
+    name: calculate_refund
+    args: {amount: 1299, percent: 25}
+  - type: contains
+    values: ["324.75"]
+mock:
+  tool_calls:
+    - {name: lookup_order, args: {order_id: "A-1002"}}
+    - {name: calculate_refund, args: {amount: 1299, percent: 25}}
+  reply: The refund for order A-1002 is $324.75 (25% of $1,299.00).

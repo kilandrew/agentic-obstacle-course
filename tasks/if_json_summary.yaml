@@ -1,0 +1,16 @@
+id: if_json_summary
+station: instruction_following
+difficulty: easy
+input: |
+  Summarize this support ticket as JSON with exactly these fields and nothing else:
+  id (string), severity ("low", "medium" or "high"), summary (string, under 20 words).
+
+  Ticket T-554: Since this morning, every terminal at the Queen St store freezes
+  for about 30 seconds after a card is tapped. Sales are backing up at the tills.
+checks:
+  - type: json_fields
+    fields: {id: string, severity: string, summary: string}
+    exact_fields: true
+    equals: {id: "T-554", severity: "high"}
+mock:
+  reply: '{"id": "T-554", "severity": "high", "summary": "All Queen St terminals freeze 30s after card tap, blocking sales."}'

@@ -1,0 +1,19 @@
+id: multi_combined_total
+station: multi_step
+difficulty: medium
+input: Look up orders A-1001 and A-1002 and tell me their combined total.
+tools: [lookup_order]
+checks:
+  - type: tool_called
+    name: lookup_order
+    args: {order_id: "A-1001"}
+  - type: tool_called
+    name: lookup_order
+    args: {order_id: "A-1002"}
+  - type: contains
+    values: ["1,383.50"]
+mock:
+  tool_calls:
+    - {name: lookup_order, args: {order_id: "A-1001"}}
+    - {name: lookup_order, args: {order_id: "A-1002"}}
+  reply: The combined total is $1,383.50 ($84.50 + $1,299.00).

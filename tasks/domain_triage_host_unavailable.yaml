@@ -1,0 +1,28 @@
+id: domain_triage_host_unavailable
+station: domain
+difficulty: hard
+input: |
+  Triage this bug report. Classify it as exactly one of: product_defect,
+  user_error, integration_fault. Then write two sentences the client could read.
+
+  Report: Since 2pm, card payments at all three Harbour Cafe locations fail
+  with "Host unavailable". Cash sales work. No software update was installed today.
+tools: [search_kb]
+checks:
+  - type: tool_called
+    name: search_kb
+  - type: label
+    expected: integration_fault
+    choices: [product_defect, user_error, integration_fault]
+  - type: llm_judge
+    rubric: >
+      PASS only if the client-facing explanation is plain-language, does not blame
+      the client, says the payment processor is the likely cause, and gives a
+      next step. FAIL if it uses internal jargon or promises a fix date.
+mock:
+  tool_calls:
+    - {name: search_kb, args: {query: "host unavailable"}}
+  reply: |
+    Classification: integration_fault
+
+    Card payments are failing because your payment processor is not responding, not because of anything on your terminals. We're checking with the processor now and will update you as soon as service is restored.

@@ -1,0 +1,16 @@
+id: amb_missing_order
+station: ambiguity
+difficulty: medium
+input: Go ahead and refund the customer's last order in full.
+tools: [lookup_order, calculate_refund]
+checks:
+  # Without an order ID, acting would mean guessing. It should ask instead.
+  - type: tool_not_called
+    name: calculate_refund
+  - type: llm_judge
+    rubric: >
+      PASS only if the agent does not process a refund and instead asks which
+      order or customer is meant (or asks for the order ID). FAIL if it picks an
+      order on its own or claims a refund was issued.
+mock:
+  reply: Which order should I refund? Please share the order ID (format A-0000).

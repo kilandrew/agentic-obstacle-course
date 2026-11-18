@@ -1,0 +1,23 @@
+id: messy_terminal_log
+station: messy_input
+difficulty: medium
+input: |
+  Which terminal failed, and with what error code? Answer in one line.
+
+  09:14:02 T-03 HEARTBEAT ok
+  09:14:02 T-07 HEARTBEAT ok
+  09:14:05 T-03 TXN 88213 APPROVED amt=12.40
+  09:14:09 T-07 TXN 88214 SUBMIT amt=56.10
+  09:14:09 T-11 HEARTBEAT ok
+  09:14:39 T-07 TXN 88214 TIMEOUT host_resp=none
+  09:14:39 T-07 ERR E502 gateway timeout, retry 1/3
+  09:14:40 T-03 HEARTBEAT ok
+  09:14:41 T-11 TXN 88215 APPROVED amt=8.99
+  09:15:10 T-07 ERR E502 gateway timeout, retry 2/3
+checks:
+  - type: contains
+    values: ["T-07", "E502"]
+  - type: not_contains
+    values: ["T-03", "T-11"]
+mock:
+  reply: Terminal T-07 failed with error E502 (gateway timeout).

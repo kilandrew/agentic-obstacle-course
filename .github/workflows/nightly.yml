@@ -1,0 +1,48 @@
+name: Nightly obstacle course
+
+# Like a nightly hardware regression: rerun the whole suite on a schedule,
+# keep the results, and fail loudly if anything got worse.
+on:
+  schedule:
+    - cron: "0 7 * * *"   # 07:00 UTC = 2-3 AM Toronto
+  workflow_dispatch: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      # Bring back the previous run so the report can show regressions.
+      - uses: actions/cache/restore@v4
+        with:
+          path: results
+          key: results-${{ github.run_id }}
+          restore-keys: results-
+
+      - name: Run suite
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python run.py \
+            --model anthropic:${{ vars.ANTHROPIC_MODEL }} \
+            --model openai:${{ vars.OPENAI_MODEL }} \
+            --judge anthropic:${{ vars.ANTHROPIC_MODEL }} \
+            --runs 3 --fail-on-regression
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: results
+          key: results-${{ github.run_id }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: obstacle-course-results
+          path: results/
