@@ -1,0 +1,18 @@
+id: find_critical_site
+station: tool_use
+difficulty: medium
+input: List the id and address of any site that is in a critical status. 
+tools: [lookup_status, search_sites]
+checks:
+  - type: tool_called
+    name: search_sites
+  - type: tool_called
+    name: lookup_status
+    args: {color: "Red"}
+  - type: contains
+    values: ["CA-0001", "111 Maple Avenue"]
+mock:
+  tool_calls:
+    - {name: search_sites, args: {query: "status"}}
+    - {name: lookup_status, args: {color: "Red"}}
+  reply: Site CA-0001 at 111 Maple Avenue is currently in critical condition.

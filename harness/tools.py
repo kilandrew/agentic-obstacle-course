@@ -25,6 +25,22 @@ KB = [
      "body": "Known rounding defect in v4.2 split-tender logic. Fixed in v4.3."},
 ]
 
+STATUS_DEF = {
+    "Green" : "No Problems at site, all systems operational",
+    "Yellow" : "Site is experiencing an inhibiting issue. Operations will be delayed. Help Desk will need to be notified.",
+    "Red" : "Site is in critcal condition. All operations have been halted. Immediate Support is required.",
+    "White" : "Site was previously in 'Red' Status but is currently under maintenance by our technicians. Will return to 'Green' Status shortly.",
+    "Black" : "Site is out of commision and/or permanently closed. No consideration required."
+}
+
+SITES = [
+    {"id": "US-0001", "address": "123 Seasame Street", "Status": "Green"},
+    {"id": "US-0003", "address": "456 Muppet Road", "Status": "Yellow"},
+    {"id": "US-0011", "address": "789 Learning Crescent", "Status": "White"},
+    {"id": "CA-0001", "address": "111 Maple Avenue", "Status": "Red"},
+    {"id": "CA-0007", "address": "222 Moose Boulevard", "Status": "Black"},
+]
+
 
 def lookup_order(order_id: str):
     order = ORDERS.get(order_id)
@@ -41,6 +57,20 @@ def search_kb(query: str):
     words = query.lower().split()
     hits = [a for a in KB if any(w in (a["title"] + a["body"]).lower() for w in words)]
     return hits[:3] or {"result": "no matches"}
+
+
+def search_sites(query: str):
+    words = query.lower().split()
+    hits = [s for s in SITES
+            if any(w in " ".join(str(v) for v in s.values()).lower() for w in words)]
+    return hits or {"result": "no matches"}
+
+
+def lookup_status(color: str):
+    for name, meaning in STATUS_DEF.items():
+        if name.lower() == color.strip().lower():
+            return {"status": name, "meaning": meaning}
+    return {"error": f"Unknown status {color}. Valid: {', '.join(STATUS_DEF)}"}
 
 
 TOOLS = {
@@ -65,6 +95,20 @@ TOOLS = {
         "parameters": {"type": "object",
                        "properties": {"query": {"type": "string"}},
                        "required": ["query"]},
+    },
+    "search_sites": {
+        "fn": search_sites,
+        "description": "Search sites by any field (site ID like US-0001, address, or status color).",
+        "parameters": {"type": "object",
+                       "properties": {"query": {"type": "string"}},
+                       "required": ["query"]},
+    },
+    "lookup_status": {
+        "fn": lookup_status,
+        "description": "Explain what a site status color code means (Green, Yellow, Red, White, Black).",
+        "parameters": {"type": "object",
+                       "properties": {"color": {"type": "string"}},
+                       "required": ["color"]},
     },
 }
 
