@@ -1,0 +1,25 @@
+id: missing_terminal_log
+station: messy_input
+difficulty: easy
+input: |
+  When do the timeouts occur? Only state the timestamps and nothing else.
+
+  1 E01 - SALE START [01]
+  11:22:02 E97 - POLLING PAYMENT HOST [01]
+  11:22:04 E97 - POLLING PAYMENT HOST [01]
+  11:22:04 E97 - POLLING PAYMENT HOST [01]
+  11:22:07 E01 - SALE START [02]
+  11:22:13 E03 - HEARTBEAT
+  11:22:29 E97 - POLLING PAYMENT HOST [02]
+  11:22:46 E97 - POLLING PAYMENT HOST [02]
+  11:22:47 E99 - PAYMENT HOST TIMEOUT [01]
+  11:22:50 E77 - HEARTBEAT INTERRUPT
+  11:23:31 E01 - SALE START [03]
+  11:23:44 E99 - 
+
+  
+checks:
+  - type: contains
+    values: ["11:22:47", "11:23:44"]
+mock:
+  reply: Multiple Payment Host Timeouts at 11:22:47 and 11:23:44
