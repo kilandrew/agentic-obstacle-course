@@ -13,6 +13,10 @@ ORDERS = {
                "items": ["POS terminal"], "payment": "credit"},
     "A-1003": {"customer": "Northside Books", "total": 42.00, "status": "cancelled",
                "items": ["barcode scanner cable"], "payment": "credit"},
+    "A-1004": {"customer": "Seasame Tailors", "total": 249.99, "status": "Delivered",
+                   "items": ["40 Ft Silk Sheet Fabric"], "payment": "credit"},
+    "A-1005": {"customer": "Moose Waste Disposal", "total": 100.00, "status": "Delivered",
+                    "items": ["50 lbs of Ground Carribean Coffee"], "payment": "credit"},
 }
 
 KB = [
@@ -23,6 +27,8 @@ KB = [
      "body": "Thermal paper loaded upside down. Flip the roll. Operator error."},
     {"id": "KB-47", "title": "Totals off by one cent on split tenders",
      "body": "Known rounding defect in v4.2 split-tender logic. Fixed in v4.3."},
+    {"id": "KB-52", "title": "Shift Records are missing cancelled transactions.",
+          "body": "Shift Records do not record cancelled transactions. This is working as intended."},
 ]
 
 STATUS_DEF = {
@@ -30,7 +36,7 @@ STATUS_DEF = {
     "Yellow" : "Site is experiencing an inhibiting issue. Operations will be delayed. Help Desk will need to be notified.",
     "Red" : "Site is in critcal condition. All operations have been halted. Immediate Support is required.",
     "White" : "Site was previously in 'Red' Status but is currently under maintenance by our technicians. Will return to 'Green' Status shortly.",
-    "Black" : "Site is out of commision and/or permanently closed. No consideration required."
+    "Black" : "Site is no longer part of our client network, therefore no services can be rendered. No consideration required."
 }
 
 SITES = [
@@ -39,6 +45,7 @@ SITES = [
     {"id": "US-0011", "address": "789 Learning Crescent", "Status": "White"},
     {"id": "CA-0001", "address": "111 Maple Avenue", "Status": "Red"},
     {"id": "CA-0007", "address": "222 Moose Boulevard", "Status": "Black"},
+    {"id": "CA-0008", "address": "333 Harbour Road", "Status": "Green"},
 ]
 
 

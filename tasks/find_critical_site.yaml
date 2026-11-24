@@ -1,5 +1,5 @@
 id: find_critical_site
-station: tool_use
+station: multi_step
 difficulty: medium
 input: List the id and address of any site that is in a critical status. 
 tools: [lookup_status, search_sites]

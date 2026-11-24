@@ -1,0 +1,32 @@
+id: shipped_to_black_site
+station: multi_step
+difficulty: hard
+input: |
+  There was a missing shipment id=A-1005 reported by one of our clients; Habour Cafe. 
+  Find out where it ended up and if its recoverable. 
+  An order is recoverable if the wrong site it was sent to is still in our client network.
+  If it is recoverable, dictate the new shipment manifest in JSON with exactly these fields and nothing else:
+  Sender_Site_Name (string), Sender_Site_Address (string), Receiver_Site_Name (string), Receiver_Site_Address (string)
+  If it is not recoverable, according to our policy we only offer a 50% partial refund for shipping errors, Calcuate the refund and state the reason for it.
+tools: [lookup_order, search_sites, lookup_status, calculate_refund]
+checks:
+  - type: tool_called
+    name: lookup_order
+    args: {order_id: "A-1005"}
+  - type: tool_called
+    name: search_sites
+  - type: tool_called
+    name: lookup_status
+    args: {color: "Black"}
+  - type: tool_called
+    name: calculate_refund
+    args: {amount: 100.00, percent: 50}
+  - type: contains
+    values: ["50.00"]
+mock:
+  tool_calls:
+    - {name: lookup_order, args: {order_id: "A-1005"}}
+    - {name: search_sites, args: {query: "Moose"}}
+    - {name: lookup_status, args: {color: "Black"}}
+    - {name: calculate_refund, args: {amount: 100.00, percent: 50}}
+  reply: We need to issue a $50.00 refund (50% of $100.00) because the missing shipment got sent outside our client network.
