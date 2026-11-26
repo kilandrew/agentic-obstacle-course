@@ -35,6 +35,10 @@ def check_contains(check, result):
     missing = [v for v in check["values"] if v.lower() not in text]
     return not missing, f"missing: {missing}" if missing else "all present"
 
+def check_contains_any(check, result):
+    text = result["final_text"].lower()
+    found = [v for v in check["values"] if v.lower() in text]
+    return bool(found), f"found: {found}" if found else f"none of: {check['values']}"
 
 def check_not_contains(check, result):
     text = result["final_text"].lower()
@@ -112,6 +116,7 @@ def check_llm_judge(check, result, task, judge):
 
 CHECKS = {
     "contains": check_contains,
+    "contains_any": check_contains_any,
     "not_contains": check_not_contains,
     "json_fields": check_json_fields,
     "tool_called": check_tool_called,

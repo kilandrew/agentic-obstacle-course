@@ -14,6 +14,7 @@ SYSTEM = (
 
 def run_agent(model, task, max_turns=8):
     """Run one attempt at one task. Returns the full transcript plus stats."""
+    toolbox.reset_state()
     if hasattr(model, "load_task"):
         model.load_task(task)
 
