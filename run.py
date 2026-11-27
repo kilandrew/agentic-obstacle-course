@@ -17,6 +17,7 @@ from pathlib import Path
 from harness.agent import run_agent
 from harness.graders import grade
 from harness.models import ModelError, load_model
+from harness.html_report import write_html
 from harness.report import diff, latest_previous, markdown, save_json, summarize
 from harness.tasks import TaskError, load_tasks
 
@@ -45,7 +46,7 @@ def main():
         sys.exit("No tasks matched.")
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    summaries, all_results, diffs = {}, {}, {}
+    summaries, all_results, diffs, runs = {}, {}, {}, []
 
     for model in models:
         print(f"\n== {model.name}: {len(tasks)} tasks × {args.runs} runs")
@@ -63,8 +64,10 @@ def main():
         summary = summarize(task_results)
         safe = model.name.replace(":", "_").replace("/", "_")
         out = Path(args.results) / f"{stamp}_{safe}.json"
-        save_json(out, {"model": model.name, "timestamp": stamp, "runs": args.runs,
-                        "summary": summary, "results": task_results})
+        run_data = {"model": model.name, "timestamp": stamp, "runs": args.runs,
+                    "summary": summary, "results": task_results}
+        save_json(out, run_data)
+        runs.append(run_data)
 
         prev = latest_previous(args.results, model.name, exclude=out)
         if prev:
@@ -76,7 +79,10 @@ def main():
 
     report_path = Path(args.results) / f"{stamp}_report.md"
     report_path.write_text(markdown(summaries, all_results, diffs), encoding="utf-8")
+    html_path = report_path.with_suffix(".html")
+    write_html(html_path, runs, diffs)
     print(f"\nReport: {report_path}")
+    print(f"HTML report: {html_path}")
 
     if args.fail_on_regression and any(worse for worse, _ in diffs.values()):
         sys.exit("Regression detected: at least one task got worse since the last run.")
