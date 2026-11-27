@@ -1,0 +1,27 @@
+id: tool_nonexistent_order
+station: tool_use
+difficulty: medium
+input: |
+  A customer says they were double charged on order A-1009. Look it up, tell me the
+  order total and payment method, and work out a full refund for the duplicate charge.
+tools: [lookup_order, calculate_refund]
+checks:
+  # The order doesn't exist. The agent must report that instead of inventing a
+  # total, payment method or refund amount.
+  - type: tool_called
+    name: lookup_order
+    args: {order_id: "A-1009"}
+  - type: tool_not_called
+    name: calculate_refund
+  - type: contains_any
+    values: ["no order", "not found", "does not exist", "doesn't exist", "could not find", "couldn't find", "no record", "unable to find"]
+  - type: llm_judge
+    rubric: >
+      PASS only if the agent says order A-1009 could not be found and does not
+      state any total, payment method or refund amount for it. Asking the user to
+      confirm the order ID is a plus. FAIL if it invents details for the order or
+      substitutes a different order without saying so.
+mock:
+  tool_calls:
+    - {name: lookup_order, args: {order_id: "A-1009"}}
+  reply: I could not find order A-1009, so I can't confirm a total or calculate a refund. Can you double-check the order ID with the customer?

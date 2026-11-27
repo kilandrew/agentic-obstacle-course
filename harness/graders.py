@@ -76,8 +76,15 @@ def check_tool_called(check, result):
 
 
 def check_tool_not_called(check, result):
-    called = [c["name"] for c in result["tool_calls"]]
-    return check["name"] not in called, f"calls: {called}"
+    """Fails if the tool was called at all, or, when `args` is given, only if it
+    was called with those arguments (so a tool can be allowed for one use but
+    forbidden for another)."""
+    want = check.get("args", {})
+    bad = [c for c in result["tool_calls"] if c["name"] == check["name"]
+           and all(k in c["args"] and _matches(v, c["args"][k]) for k, v in want.items())]
+    if bad:
+        return False, f"forbidden call(s): {[c['args'] for c in bad]}"
+    return True, f"calls: {[c['name'] for c in result['tool_calls']]}"
 
 
 def check_label(check, result):

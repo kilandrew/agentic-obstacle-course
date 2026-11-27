@@ -114,4 +114,4 @@ def markdown(runs_by_model, task_results_by_model, diffs):
 
 def save_json(path, data):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
-    Path(path).write_text(json.dumps(data, indent=2))
+    Path(path).write_text(json.dumps(data, indent=2), encoding="utf-8")

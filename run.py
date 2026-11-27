@@ -68,14 +68,14 @@ def main():
 
         prev = latest_previous(args.results, model.name, exclude=out)
         if prev:
-            diffs[model.name] = diff(summary, json.loads(prev.read_text())["summary"])
+            diffs[model.name] = diff(summary, json.loads(prev.read_text(encoding="utf-8"))["summary"])
         else:
             diffs[model.name] = ([], [])
         summaries[model.name] = summary
         all_results[model.name] = task_results
 
     report_path = Path(args.results) / f"{stamp}_report.md"
-    report_path.write_text(markdown(summaries, all_results, diffs))
+    report_path.write_text(markdown(summaries, all_results, diffs), encoding="utf-8")
     print(f"\nReport: {report_path}")
 
     if args.fail_on_regression and any(worse for worse, _ in diffs.values()):

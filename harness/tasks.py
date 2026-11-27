@@ -33,7 +33,7 @@ def validate(task, path):
 def load_tasks(directory="tasks", station=None, task_id=None):
     tasks, seen = [], set()
     for path in sorted(Path(directory).glob("*.yaml")):
-        task = yaml.safe_load(path.read_text())
+        task = yaml.safe_load(path.read_text(encoding="utf-8"))
         validate(task, path)
         if task["id"] in seen:
             raise TaskError(f"{path}: duplicate id '{task['id']}'")

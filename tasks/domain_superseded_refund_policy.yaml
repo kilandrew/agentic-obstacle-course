@@ -1,0 +1,42 @@
+id: domain_superseded_refund_policy
+station: domain
+difficulty: hard
+input: |
+  Harbour Cafe reported today, 2026-11-27, that the POS terminal on order A-1002
+  arrived with a cracked screen from shipping damage. Look up our current refund
+  policy for this, work out the refund, and tell me the amount and which policy ID
+  you applied.
+tools: [lookup_order, search_policies, calculate_refund]
+checks:
+  # Each place a model can stop early gives a different, plausible answer:
+  #   25% = $324.75  stopped at page 1 (POL-101, outdated; also the answer to tool_refund_calc)
+  #   30% = $389.70  stopped at page 2 (POL-120, superseded)
+  #   35% = $454.65  found POL-141 but missed the 14-day condition
+  #   15% = $194.85  correct: delivered 2026-11-10, reported 17 days later
+  - type: tool_called
+    name: lookup_order
+    args: {order_id: "A-1002"}
+  - type: tool_called
+    name: search_policies
+  - type: tool_called
+    name: calculate_refund
+    args: {amount: 1299, percent: 15}
+  - type: contains
+    values: ["194.85", "POL-141"]
+  - type: llm_judge
+    rubric: >
+      PASS only if the agent gives a refund of $194.85 under POL-141's late-report
+      rate, and explains that the damage was reported more than 14 days after the
+      2026-11-10 delivery. FAIL if it presents any other amount as the refund, or
+      applies POL-101 or POL-120 as current policy.
+mock:
+  tool_calls:
+    - {name: lookup_order, args: {order_id: "A-1002"}}
+    - {name: search_policies, args: {query: "shipping damage refund"}}
+    - {name: search_policies, args: {query: "shipping damage refund", page: 2}}
+    - {name: search_policies, args: {query: "shipping damage refund", page: 3}}
+    - {name: calculate_refund, args: {amount: 1299, percent: 15}}
+  reply: >
+    The refund is $194.85 under POL-141. That policy supersedes POL-120 and POL-101 for
+    hardware over $1,000, but because the damage was reported 17 days after the
+    2026-11-10 delivery (more than 14 days), the 15% late-report rate applies.
